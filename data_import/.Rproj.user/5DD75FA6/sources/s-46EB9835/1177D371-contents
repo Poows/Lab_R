@@ -1,0 +1,97 @@
+---
+title: "Лабораторная работа 1"
+author: "Акименков А.А. ПМИ 4-1 Вариант 2"
+date: "07 04 2021"
+output: word_document
+---
+  С помощью пакета rvest или парсинга XMLс помощью xpath запросов соберите данные с сайта согласно своему варианту. В итоговой таблице должно быть не менее 50 записей и не менее 5 признаков, из которых как минимум два количественных. Снабдите файл справочником в формате Markdown.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('rvest')
+library('RCurl')
+library('XML')
+library('stringr')
+```
+Загрузка информации с сайта:
+```{r, echo=FALSE, comment=""}
+print('https://www.kinopoisk.ru/lists/editorial/theme_dragon/')
+fileURL <- 'https://www.kinopoisk.ru/lists/editorial/theme_dragon/'
+
+webpage <- read_html(fileURL)
+```
+Ранги первых пяти фильмов:
+```{r, echo=FALSE, comment=""}
+rank_data <- webpage %>% html_nodes('.selection-film-item-position') %>% html_text
+
+rank_data <- as.numeric(rank_data)
+
+head(rank_data)
+```
+Название первых пятифильмов:
+```{r, echo=FALSE, comment=""}
+title_data <- webpage %>% html_nodes('.selection-film-item-meta__name') %>% html_text
+
+head(title_data)
+```
+Дата выхода первых пяти фильмов:
+```{r, echo=FALSE, comment=""}
+release_date <- webpage %>% html_nodes('.selection-film-item-meta__original-name') %>% html_text
+
+vector <- rep(NA, length(release_date))
+
+g <- 1
+for (i in release_date) {
+  year <- strsplit(i, ', ')
+  year <- unlist(year)
+  year <- year[length(year)]
+  
+  if (str_length(year) > 4) {
+    year <- substring(year, 1, 4)
+  } 
+  vector[g] <- year
+  g <- g + 1
+}
+
+release_date_vector <- as.numeric(unlist(vector))
+head(release_date_vector)
+```
+Страны производитель первых пять фильмов фильмов:
+```{r, echo=FALSE, comment=""}
+country_date <- webpage %>% html_nodes('.selection-film-item-meta__meta-additional-item') %>% html_text
+
+vector_country_date <- rep(NA, length(country_date)/2)
+i <- 1
+g <- 1
+while (i < length(country_date)) {
+  if (!is.na(strsplit(country_date[i], ', '))) {
+    country <- strsplit(country_date[i], ', ')
+  }
+  country <- unlist(country)
+  country <- country[1]
+  vector_country_date[g] <- country
+  i <- i + 2
+  g <- g + 1
+}
+
+head(vector_country_date)
+```
+Оценки первых пяти фильмов:
+```{r, echo=FALSE, comment=""}
+rank_data_negative <- webpage %>% html_nodes('.selection-film-item-poster__rating_negative') %>% html_text
+rank_data_positive <- webpage %>% html_nodes('.selection-film-item-poster__rating_positive') %>% html_text
+rank_data_neutral <- webpage %>% html_nodes('.selection-film-item-poster__rating_neutral') %>% html_text
+
+rank_all <- append(rank_data_negative, rank_data_positive)
+rank_all <- append(rank_all, rank_data_neutral)
+rank_all <- append(rank_all, NA)
+
+head(rank_all)
+```
+Итоговая таблица с данными:
+```{r, echo=FALSE, results="hold", comment="", tidy=TRUE}
+DF_movies <- data.frame(Rank = rank_data, Title = title_data,
+                        Release = release_date_vector, Metascore = rank_all,
+                        Country = vector_country_date)
+head(DF_movies)
+tail(DF_movies)
+```

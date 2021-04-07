@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1617809792787.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1748635759",
+    "id" : "1177D371",
+    "lastKnownWriteTime" : 1617812716,
+    "last_content_update" : 1617812716643,
+    "path" : "C:/Rlib/data_import/movies.Rmd",
+    "project_path" : "movies.Rmd",
+    "properties" : {
+        "cursorPosition" : "21,18",
+        "last_setup_crc32" : "46EB9835dc23933c",
+        "scrollLine" : "20",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
