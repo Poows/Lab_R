@@ -59,8 +59,9 @@ for (i in 2011:2020){
   df <- rbind(df, df.temp)
 }
 
+unique(df$Reporter)
+
 df <- df[, c(2, 4, 10, 30, 32)]
-df_test <- df
 df <- data.table(df)
 
 
@@ -69,23 +70,55 @@ df <- df[, Netweight..kg. := as.double(Netweight..kg.)]
 df[, round(mean(.SD$Netweight..kg., na.rm = T), 0), by = Year]
 
 df[, Reporter, Year]
-df_test[, "Partner"]
+
+df[df$Year == 2014]
 
 df[, Netweight..kg..mean := round(mean(.SD$Netweight..kg., na.rm = T), 0), by = Year]
 df[!is.na(Netweight..kg.), Netweight..kg..mean := Netweight..kg.]
 df[is.na(Netweight..kg.), Year, Netweight..kg..mean]
 
+unique(df$Reporter)
+
+df$Reporter[]
+
 new.df <- data.frame()
-new.df <- rbind(new.df, cbind(df[(df$Year < 2014) | (df$Year > 2014), ], C_Year = '!2014'))
-new.df <- rbind(new.df, cbind(df[df$Year == 2014, ], C_Year = '==2014'))
+
+new.df <- rbind(new.df, cbind(df[(df$Year < 2014) &
+                                 (df$Reporter != 'Belgium') & 
+                                 (df$Reporter != 'Ukraine') &
+                                 (df$Reporter != 'Estonia') & 
+                                 (df$Reporter != 'Estonia') &
+                                 (df$Reporter != 'Germany') &
+                                 (df$Reporter != 'Finland') &
+                                 (df$Reporter != 'Hungary'), ], 
+                                  C_Year = 'Остальные страны'))
+new.df <- rbind(new.df, cbind(df[((df$Reporter == 'Belgium') | 
+                                 (df$Reporter == 'Ukraine') | 
+                                 (df$Reporter == 'Estonia') | 
+                                 (df$Reporter == 'Estonia') |
+                                 (df$Reporter == 'Germany') |
+                                 (df$Reporter == 'Finland') | 
+                                 (df$Reporter == 'Netherlands') |
+                                 (df$Reporter == 'Hungary')), ], C_Year = 'Страны и эмбарго в 2014'))
+new.df <- rbind(new.df, cbind(df[(df$Reporter != 'Belgium') & 
+                                 (df$Reporter != 'Ukraine') &
+                                 (df$Reporter != 'Estonia') & 
+                                 (df$Reporter != 'Estonia') &
+                                 (df$Reporter != 'Finland') &
+                                 (df$Reporter != 'Germany') &
+                                 (df$Reporter != 'Netherlands') &
+                                 (df$Reporter != 'Hungary'), ], 
+                                  C_Year = 'Остальные страны'))
 dim(new.df)
+df
 new.df
 
-png('ggplot.png', width = 1000, height= 1000)
-ggplot(data = new.df, aes(x = C_Year, y = Netweight..kg..mean, group = C_Year, color = C_Year)) +
+png('ggplot1.png', width = 1000, height= 1000)
+ggplot(data = new.df, aes(x = Year, y = Netweight..kg..mean, group = C_Year, color = C_Year), width = 1000, height= 1000) +
   geom_boxplot() +
   scale_color_manual(values = c('red', 'blue', 'green'),
                      name = "Группы стран-поставщиков:") +
   labs(title = 'Коробчатые диаграммы суммарной массы поставок',
        x = 'Страны', y = 'Масса')
 dev.off()
+
